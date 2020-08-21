@@ -52,14 +52,16 @@ const getLicenseInformationForDependency = dependencyPath => {
 
 const getLicenseInformationForCompilation = (compilation, filter) => {
   const fileDependencies = Array.from(compilation.fileDependencies);
-  return fileDependencies.reduce((memo, dependencyPath) => {
-    const match = dependencyPath.match(filter);
-    if (match) {
-      const [, rootPath, dependencyName] = match;
-      memo[dependencyName] = getLicenseInformationForDependency(rootPath);
-    }
-    return memo;
-  }, {});
+  return fileDependencies
+    .filter(dependencyPath => !dependencyPath.includes("/."))
+    .reduce((memo, dependencyPath) => {
+      const match = dependencyPath.match(filter);
+      if (match) {
+        const [, rootPath, dependencyName] = match;
+        memo[dependencyName] = getLicenseInformationForDependency(rootPath);
+      }
+      return memo;
+    }, {});
 };
 
 const getLicenseViolations = (licenseInformation, allow) => {
